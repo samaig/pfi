@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,6 +11,14 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterContent />
+    </Suspense>
+  );
+}
+
+function RegisterContent() {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
