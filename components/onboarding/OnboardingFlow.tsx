@@ -15,6 +15,11 @@ import {
   ChevronsUpDown,
   CheckCircle2,
   Check,
+  MapPin,
+  Users,
+  Calendar,
+  HandHeart,
+  UserCheck,
 } from "lucide-react";
 import {
   Command,
@@ -71,6 +76,14 @@ const SUPPORT_OPTIONS = [
   { value: "Wellbeing & Mental Health", label: "Wellbeing & Mental Health", Icon: Sparkles },
 ];
 
+const STEP_META = [
+  { label: "About You", Icon: UserCheck },
+  { label: "Children", Icon: Users },
+  { label: "Ages", Icon: Calendar },
+  { label: "Location", Icon: MapPin },
+  { label: "Support", Icon: HandHeart },
+];
+
 /* ─── Animation helpers ─────────────────────────────────── */
 
 function getVariants(direction: number) {
@@ -84,6 +97,70 @@ function getVariants(direction: number) {
 const transition = { duration: 0.15, ease: "easeInOut" as const };
 
 /* ─── Sub-components ────────────────────────────────────── */
+
+function StepIndicator({
+  currentStep,
+  totalSteps,
+}: {
+  currentStep: number;
+  totalSteps: number;
+}) {
+  return (
+    <div className="w-full">
+      {/* Step dots with connecting lines */}
+      <div className="flex items-center justify-between relative">
+        {/* Background connecting line */}
+        <div className="absolute top-4 left-[20px] right-[20px] h-[2px] bg-[#E7E2DA]" />
+        {/* Active connecting line */}
+        <div
+          className="absolute top-4 left-[20px] h-[2px] bg-[#117A65] transition-all duration-500 ease-out"
+          style={{
+            width: `calc(${((currentStep - 1) / (totalSteps - 1)) * 100}% - ${currentStep === totalSteps ? 0 : 0}px)`,
+          }}
+        />
+
+        {STEP_META.map((step, i) => {
+          const stepNum = i + 1;
+          const isCompleted = currentStep > stepNum;
+          const isCurrent = currentStep === stepNum;
+
+          return (
+            <div key={step.label} className="relative z-10 flex flex-col items-center">
+              <div
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300",
+                  isCompleted
+                    ? "bg-[#117A65] text-white"
+                    : isCurrent
+                      ? "bg-[#117A65] text-white ring-4 ring-[#117A65]/15"
+                      : "bg-white border-2 border-[#E7E2DA] text-[#9C9C9C]"
+                )}
+              >
+                {isCompleted ? (
+                  <Check className="w-3.5 h-3.5" />
+                ) : (
+                  stepNum
+                )}
+              </div>
+              <span
+                className={cn(
+                  "text-[11px] mt-1.5 font-medium transition-colors duration-300 whitespace-nowrap",
+                  isCurrent
+                    ? "text-[#117A65]"
+                    : isCompleted
+                      ? "text-[#117A65]"
+                      : "text-[#9C9C9C]"
+                )}
+              >
+                {step.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function IdentityOption({
   option,
@@ -103,7 +180,7 @@ function IdentityOption({
         "flex items-center gap-4 w-full rounded-2xl px-5 py-4 text-left transition-all duration-150",
         "border focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
         selected
-          ? "border-2 border-[#117A65] bg-[#E6F2EF]"
+          ? "border-2 border-[#117A65] bg-[#E6F2EF] shadow-sm"
           : "border border-[#E7E2DA] bg-white hover:border-[#117A65]/60 hover:bg-[#F0F8F6]"
       )}
     >
@@ -149,9 +226,9 @@ function Chip({
       type="button"
       onClick={onToggle}
       className={cn(
-        "rounded-full px-4 py-2 text-sm font-medium transition-all duration-150 border focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
+        "rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 border focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
         selected
-          ? "bg-[#117A65] border-[#117A65] text-white"
+          ? "bg-[#117A65] border-[#117A65] text-white shadow-sm"
           : "bg-white border-[#E7E2DA] text-[#1C1C1C] hover:border-[#117A65]/60 hover:bg-[#F0F8F6]"
       )}
     >
@@ -175,9 +252,9 @@ function SupportCard({
       type="button"
       onClick={onToggle}
       className={cn(
-        "relative flex flex-col items-center justify-center gap-2 rounded-2xl px-4 py-5 text-center transition-all duration-150 border focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
+        "relative flex flex-col items-center justify-center gap-2.5 rounded-2xl px-4 py-5 text-center transition-all duration-150 border focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
         selected
-          ? "border-2 border-[#117A65] bg-[#E6F2EF]"
+          ? "border-2 border-[#117A65] bg-[#E6F2EF] shadow-sm"
           : "border border-[#E7E2DA] bg-white hover:border-[#117A65]/60 hover:bg-[#F0F8F6]"
       )}
     >
@@ -188,13 +265,13 @@ function SupportCard({
       )}
       <span
         className={cn(
-          "flex items-center justify-center w-9 h-9 rounded-full",
+          "flex items-center justify-center w-10 h-10 rounded-full",
           selected ? "bg-[#117A65]/15" : "bg-[#F7F4EF]"
         )}
       >
         <Icon
           className={cn(
-            "w-4 h-4",
+            "w-5 h-5",
             selected ? "text-[#117A65]" : "text-[#6F6F6F]"
           )}
         />
@@ -373,7 +450,6 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
   /* ── Progress ── */
 
   const progressStep = currentScreen >= 3 ? currentScreen - 2 : 0;
-  const progressPct = currentScreen >= 3 ? ((currentScreen - 2) / 5) * 100 : 0;
 
   /* ── Variants ── */
 
@@ -386,8 +462,8 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
   return (
     <div className="min-h-screen bg-[#F7F4EF] flex flex-col">
       {/* ── Header ── */}
-      <header className="w-full px-6 sm:px-10 pt-6 pb-4 flex flex-col gap-3">
-        {/* Row: back + logo | progress label */}
+      <header className="w-full px-6 sm:px-10 pt-6 pb-2 flex flex-col gap-4">
+        {/* Row: back + logo */}
         <div className="flex items-center">
           {/* Left: back button + logo */}
           <div className="flex items-center gap-3 flex-1">
@@ -404,30 +480,29 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
             <Logo />
           </div>
 
-          {/* Right: step label */}
-          {currentScreen >= 3 && currentScreen <= 7 && (
-            <span className="text-[13px] text-[#6F6F6F] font-medium tabular-nums">
-              Step {progressStep} of 5
-            </span>
+          {/* Right: skip all on intro screens */}
+          {currentScreen >= 1 && currentScreen <= 2 && (
+            <button
+              type="button"
+              onClick={handleSkipAll}
+              className="text-[13px] text-[#6F6F6F] hover:text-[#1C1C1C] font-medium transition-colors focus:outline-none focus-visible:underline"
+            >
+              Skip setup
+            </button>
           )}
         </div>
 
-        {/* Progress bar (screens 3-7) */}
+        {/* Step indicator (screens 3-7) */}
         {currentScreen >= 3 && currentScreen <= 7 && (
-          <div className="w-full h-[4px] rounded-full bg-[#E7E2DA] overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-[#117A65]"
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPct}%` }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-            />
+          <div className="px-2 sm:px-8">
+            <StepIndicator currentStep={progressStep} totalSteps={5} />
           </div>
         )}
       </header>
 
       {/* ── Content ── */}
       <main className="flex-1 flex items-center justify-center px-5 sm:px-8 py-6 overflow-hidden">
-        <div className="w-full max-w-[480px]">
+        <div className="w-full max-w-[520px]">
           <AnimatePresence mode="wait" custom={direction}>
             {/* ════ SCREEN 1 — Welcome ════ */}
             {currentScreen === 1 && (
@@ -440,22 +515,33 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                 exit="exit"
                 transition={transition}
               >
-                <div className="space-y-6">
-                  <div className="space-y-3">
+                <div className="flex flex-col items-center text-center space-y-6 py-4">
+                  {/* Decorative welcome icon */}
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.05, duration: 0.3 }}
+                    className="w-20 h-20 rounded-3xl bg-[#117A65]/10 flex items-center justify-center"
+                  >
+                    <Heart className="w-10 h-10 text-[#117A65]" />
+                  </motion.div>
+
+                  <div className="space-y-3 max-w-[400px]">
                     <h1 className="text-[32px] sm:text-[36px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
-                      Welcome to Parentfits.
+                      Welcome to Parentfits
                     </h1>
-                    <p className="text-[17px] text-[#6F6F6F] leading-relaxed">
+                    <p className="text-[16px] text-[#6F6F6F] leading-relaxed">
                       Your dedicated parent support hub with everything you need
                       as a parent, in one place.
                     </p>
                   </div>
+
                   <button
                     type="button"
                     onClick={() => goTo(2, 1)}
-                    className="w-full sm:w-auto bg-[#117A65] hover:bg-[#0e6354] text-white font-medium text-[15px] px-8 py-3.5 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2"
+                    className="bg-[#117A65] hover:bg-[#0e6354] text-white font-medium text-[15px] px-10 py-3.5 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2 shadow-sm"
                   >
-                    Continue
+                    Get Started
                   </button>
                 </div>
               </motion.div>
@@ -472,23 +558,34 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                 exit="exit"
                 transition={transition}
               >
-                <div className="space-y-6">
-                  <div className="space-y-3">
+                <div className="flex flex-col items-center text-center space-y-6 py-4">
+                  {/* Decorative icon */}
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.05, duration: 0.3 }}
+                    className="w-20 h-20 rounded-3xl bg-[#E6C9B3]/30 flex items-center justify-center"
+                  >
+                    <Sparkles className="w-10 h-10 text-[#E3A14F]" />
+                  </motion.div>
+
+                  <div className="space-y-3 max-w-[400px]">
                     <h1 className="text-[32px] sm:text-[36px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
-                      Help us tailor this to you
+                      Let&apos;s personalise this
                     </h1>
-                    <p className="text-[17px] text-[#6F6F6F] leading-relaxed">
+                    <p className="text-[16px] text-[#6F6F6F] leading-relaxed">
                       Answer a few quick questions so we can show you the most
-                      relevant support.
+                      relevant support. It only takes a moment.
                     </p>
                   </div>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+
+                  <div className="flex flex-col gap-3 items-center">
                     <button
                       type="button"
                       onClick={() => goTo(3, 1)}
-                      className="w-full sm:w-auto bg-[#117A65] hover:bg-[#0e6354] text-white font-medium text-[15px] px-8 py-3.5 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2"
+                      className="bg-[#117A65] hover:bg-[#0e6354] text-white font-medium text-[15px] px-10 py-3.5 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2 shadow-sm"
                     >
-                      Get started
+                      Continue
                     </button>
                     <button
                       type="button"
@@ -515,9 +612,12 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <h2 className="text-[26px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
+                    <h2 className="text-[24px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
                       Which best describes you?
                     </h2>
+                    <p className="text-[14px] text-[#6F6F6F]">
+                      This helps us tailor your experience.
+                    </p>
                   </div>
 
                   <div className="flex flex-col gap-3">
@@ -535,26 +635,26 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center justify-between pt-2">
                     <button
                       type="button"
                       onClick={() => handleContinueIdentity(true)}
                       className="text-[14px] text-[#6F6F6F] hover:text-[#1C1C1C] transition-colors focus:outline-none focus-visible:underline"
                     >
-                      Skip for now
+                      Skip
                     </button>
                     <button
                       type="button"
                       onClick={() => handleContinueIdentity(false)}
                       disabled={!selectedIdentity || isSaving}
                       className={cn(
-                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
+                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2 shadow-sm",
                         !selectedIdentity || isSaving
                           ? "opacity-40 cursor-not-allowed"
                           : "hover:bg-[#0e6354]"
                       )}
                     >
-                      {isSaving ? "Saving…" : "Continue"}
+                      {isSaving ? "Saving..." : "Continue"}
                     </button>
                   </div>
                 </div>
@@ -574,7 +674,7 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <h2 className="text-[26px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
+                    <h2 className="text-[24px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
                       How many children do you have?
                     </h2>
                     <p className="text-[14px] text-[#6F6F6F]">
@@ -593,26 +693,26 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center justify-between pt-2">
                     <button
                       type="button"
                       onClick={() => handleContinueCount(true)}
                       className="text-[14px] text-[#6F6F6F] hover:text-[#1C1C1C] transition-colors focus:outline-none focus-visible:underline"
                     >
-                      Skip for now
+                      Skip
                     </button>
                     <button
                       type="button"
                       onClick={() => handleContinueCount(false)}
                       disabled={isSaving}
                       className={cn(
-                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
+                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2 shadow-sm",
                         isSaving
                           ? "opacity-40 cursor-not-allowed"
                           : "hover:bg-[#0e6354]"
                       )}
                     >
-                      {isSaving ? "Saving…" : "Continue"}
+                      {isSaving ? "Saving..." : "Continue"}
                     </button>
                   </div>
                 </div>
@@ -632,8 +732,8 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <h2 className="text-[26px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
-                      How old are your child(ren)?
+                    <h2 className="text-[24px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
+                      How old are your children?
                     </h2>
                     <p className="text-[14px] text-[#6F6F6F]">
                       Select all that apply.
@@ -651,26 +751,26 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center justify-between pt-2">
                     <button
                       type="button"
                       onClick={() => handleContinueAges(true)}
                       className="text-[14px] text-[#6F6F6F] hover:text-[#1C1C1C] transition-colors focus:outline-none focus-visible:underline"
                     >
-                      Skip for now
+                      Skip
                     </button>
                     <button
                       type="button"
                       onClick={() => handleContinueAges(false)}
                       disabled={isSaving}
                       className={cn(
-                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
+                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2 shadow-sm",
                         isSaving
                           ? "opacity-40 cursor-not-allowed"
                           : "hover:bg-[#0e6354]"
                       )}
                     >
-                      {isSaving ? "Saving…" : "Continue"}
+                      {isSaving ? "Saving..." : "Continue"}
                     </button>
                   </div>
                 </div>
@@ -690,11 +790,11 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <h2 className="text-[26px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
+                    <h2 className="text-[24px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
                       Where are you based?
                     </h2>
                     <p className="text-[14px] text-[#6F6F6F]">
-                      We use this to show nearby and relevant support.
+                      We use this to show nearby and relevant support services.
                     </p>
                   </div>
 
@@ -715,7 +815,7 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                           {selectedTown
                             ? ukTowns.find((t) => t.value === selectedTown)
                                 ?.label
-                            : "Search for your town…"}
+                            : "Search for your town..."}
                         </span>
                         <ChevronsUpDown className="w-4 h-4 text-[#9C9C9C] shrink-0 ml-2" />
                       </button>
@@ -726,8 +826,8 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                       sideOffset={6}
                     >
                       <Command>
-                        <CommandInput placeholder="Type to search…" />
-                        <CommandList className="max-h-[200px]">
+                        <CommandInput placeholder="Type to search..." />
+                        <CommandList className="max-h-[220px]">
                           <CommandEmpty>No town found.</CommandEmpty>
                           <CommandGroup>
                             {ukTowns.map((town) => (
@@ -751,26 +851,26 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                     </PopoverContent>
                   </Popover>
 
-                  <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center justify-between pt-2">
                     <button
                       type="button"
                       onClick={() => handleContinueTown(true)}
                       className="text-[14px] text-[#6F6F6F] hover:text-[#1C1C1C] transition-colors focus:outline-none focus-visible:underline"
                     >
-                      Skip for now
+                      Skip
                     </button>
                     <button
                       type="button"
                       onClick={() => handleContinueTown(false)}
                       disabled={isSaving}
                       className={cn(
-                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
+                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2 shadow-sm",
                         isSaving
                           ? "opacity-40 cursor-not-allowed"
                           : "hover:bg-[#0e6354]"
                       )}
                     >
-                      {isSaving ? "Saving…" : "Continue"}
+                      {isSaving ? "Saving..." : "Continue"}
                     </button>
                   </div>
                 </div>
@@ -790,11 +890,11 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
               >
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <h2 className="text-[26px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
-                      What kind of support matters most right now?
+                    <h2 className="text-[24px] sm:text-[28px] font-semibold text-[#1C1C1C] leading-tight tracking-tight">
+                      What support matters most?
                     </h2>
                     <p className="text-[14px] text-[#6F6F6F]">
-                      Select all that apply.
+                      Select all that apply. You can change these later.
                     </p>
                   </div>
 
@@ -809,26 +909,26 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center justify-between pt-2">
                     <button
                       type="button"
                       onClick={handleSkipNeeds}
                       className="text-[14px] text-[#6F6F6F] hover:text-[#1C1C1C] transition-colors focus:outline-none focus-visible:underline"
                     >
-                      Skip for now
+                      Skip
                     </button>
                     <button
                       type="button"
                       onClick={handleFinish}
                       disabled={isSaving}
                       className={cn(
-                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2",
+                        "bg-[#117A65] text-white font-medium text-[15px] px-7 py-3 rounded-xl transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#117A65] focus-visible:ring-offset-2 shadow-sm",
                         isSaving
                           ? "opacity-40 cursor-not-allowed"
                           : "hover:bg-[#0e6354]"
                       )}
                     >
-                      {isSaving ? "Saving…" : "Finish"}
+                      {isSaving ? "Saving..." : "Finish"}
                     </button>
                   </div>
                 </div>
@@ -846,22 +946,31 @@ export function OnboardingFlow({ userId, initialData }: OnboardingFlowProps) {
                 exit="exit"
                 transition={transition}
               >
-                <div className="flex flex-col items-center text-center space-y-5 py-8">
+                <div className="flex flex-col items-center text-center space-y-6 py-8">
                   <motion.div
                     initial={{ scale: 0.6, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.05, duration: 0.3, ease: "easeOut" }}
+                    className="w-20 h-20 rounded-3xl bg-[#3A9D7A]/10 flex items-center justify-center"
                   >
-                    <CheckCircle2 className="w-16 h-16 text-[#3A9D7A]" />
+                    <CheckCircle2 className="w-12 h-12 text-[#3A9D7A]" />
                   </motion.div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 max-w-[340px]">
                     <h2 className="text-[28px] font-semibold text-[#1C1C1C] tracking-tight">
-                      You&apos;re all set
+                      You&apos;re all set!
                     </h2>
-                    <p className="text-[16px] text-[#6F6F6F] leading-relaxed max-w-[320px]">
-                      We&apos;ll use this to personalise your experience. You can
-                      update your preferences anytime.
+                    <p className="text-[15px] text-[#6F6F6F] leading-relaxed">
+                      We&apos;ll use your preferences to personalise your
+                      experience. You can update them anytime in settings.
                     </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-[#9C9C9C]">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-4 h-4 border-2 border-[#9C9C9C] border-t-transparent rounded-full"
+                    />
+                    Redirecting to your dashboard...
                   </div>
                 </div>
               </motion.div>
